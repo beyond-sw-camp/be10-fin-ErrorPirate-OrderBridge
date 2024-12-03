@@ -38,7 +38,7 @@
 [WBS](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=1397057023&single=true)
 
 ### 1-6. ERD
-[ERD Cloud](https://www.erdcloud.com/d/voRzi3kXFkSQWkTTx)
+[ERD Cloud](https://www.erdcloud.com/d/bKiEB4BYQTvGq22FB)
 
 ### 1-7. 화면 설계서
 [Figma](https://www.figma.com/design/75SMKjrV0RAYySz6nuMzhf/%EC%97%90%EB%9F%AC-%ED%95%B4%EC%A0%81%EB%8B%A8?node-id=0-1&t=DVRxg4B582bo3SLt-1)
