@@ -9,27 +9,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tb_sales_order") // 주문서
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SalesOrder {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long salesOrderSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "quoatationSeq")
+    @JoinColumn(name = "quotation_seq")
     private Quotation quotation; // 견적서
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "userSeq")
+    @JoinColumn(name = "user_seq")
     private User user; // 주문서 담당자 번호
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "clientSeq")
+    @JoinColumn(name = "client_seq")
     private Client client; // 거래처 번호
 
     private String salesOrderName; // 주문서 명

@@ -15,11 +15,11 @@ public class SalesOrderItem {
     private Long salesOrderItemSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "salesOrderSeq")
+    @JoinColumn(name = "sales_order_seq")
     private SalesOrder salesOrder; // 주문서
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemSeq")
+    @JoinColumn(name = "item_seq")
     private Item item; // 품목
 
     private int salesOrderItemQuantity; // 주문서 품목 수량

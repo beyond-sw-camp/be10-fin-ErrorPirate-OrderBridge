@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
-@Tag(name = "출하지시서 컨트롤러", description = "출하지시서 조회")
+@Tag(name = "출하지시서")
 @RestController
 @RequiredArgsConstructor    // final 을 받은 필드의 생성자를 주입
 @RequestMapping("/api/v1/shipping-instruction")
