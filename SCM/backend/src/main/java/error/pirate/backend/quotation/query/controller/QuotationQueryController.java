@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/vi/quotation")
+@RequestMapping("/api/v1/quotation")
 @Tag(name = "Quotation", description = "견적서")
 public class QuotationQueryController {
 
