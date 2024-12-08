@@ -23,23 +23,23 @@ public class WorkOrder {
     private Long workOrderSeq;
     
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "clientSeq")
+    @JoinColumn(name = "client_seq")
     private Client client; // 거래처(납품처)
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "userSeq")
+    @JoinColumn(name = "user_seq")
     private User user; // 작업지시서 담당자
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "salesOrderSeq")
+    @JoinColumn(name = "sales_order_seq")
     private SalesOrder salesOrder; // 주문서
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "warehouseSeq")
+    @JoinColumn(name = "warehouse_seq")
     private Warehouse warehouse; // 창고
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemSeq")
+    @JoinColumn(name = "item_seq")
     private Item item; // 품목
 
     private String workOrderName; // 작업지시서 명

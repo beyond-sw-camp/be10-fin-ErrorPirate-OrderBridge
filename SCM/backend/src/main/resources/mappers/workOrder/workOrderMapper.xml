@@ -1,0 +1,73 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="error.pirate.backend.workOrder.query.mapper.WorkOrderMapper">
+
+    <!-- 작업지시서 목록
+            : 데이터가 많아지면 group_concat과 group by로 하는 것이 서브쿼리보다 효율이 좋아서 수정 예정 -->
+    <select id="readWorkOrderList" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderListDTO">
+        SELECT wo.work_order_seq
+             , wo.work_order_name
+             , w.warehouse_seq
+             , w.warehouse_name
+             , wo.work_order_indicated_date
+             , wo.work_order_status
+             , (SELECT GROUP_CONCAT(i.item_name SEPARATOR ', ')
+                  FROM tb_item i
+                 WHERE i.item_seq = wo.item_seq
+                )   AS item_names
+        FROM tb_work_order wo
+        LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
+        <where>
+             <!--작업상태 필터링-->
+            <if test="filter.workOrderStatus != null">
+                work_order_status = #{filter.workOrderStatus}
+            </if>
+            <!--생산창고 이름 필터링 -->
+            <if test="filter.warehouseName != null">
+                AND warehouse_name like concat('%', #{filter.warehouseName}, '%')
+            </if>
+            <!-- 작업지시일 검색 필터링 -->
+            <if test="filter.startDate != null">
+                AND work_order_indicated_date >= #{filter.startDate}
+            </if>
+            <if test="filter.endDate != null">
+                <![CDATA[
+                AND work_order_indicated_date <= #{filter.endDate}
+                ]]>
+            </if>
+        </where>
+       ORDER BY wo.work_order_indicated_date DESC
+              , wo.work_order_name
+        LIMIT #{filter.size} OFFSET #{offset}
+    </select>
+
+    <!--  작업지시서 목록 개수  -->
+    <select id="readWorkOrderListCount" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_work_order wo
+        LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
+        <where>
+            <if test="filter.workOrderStatus != null">
+                work_order_status = #{filter.workOrderStatus}
+            </if>
+            <if test="filter.warehouseName != null">
+                AND warehouse_name like concat('%', #{filter.warehouseName}, '%')
+            </if>
+            <if test="filter.startDate != null">
+                AND work_order_indicated_date >= #{filter.startDate}
+            </if>
+            <if test="filter.endDate != null">
+                <![CDATA[
+                AND work_order_indicated_date <= #{filter.endDate}
+                ]]>
+            </if>
+        </where>
+    </select>
+
+    <select id="readWorkOrder" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderDetailDTO">
+
+    </select>
+    
+</mapper>
