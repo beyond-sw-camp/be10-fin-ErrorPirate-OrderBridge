@@ -1,9 +1,6 @@
 package error.pirate.backend.shippingInstruction.query.service;
 
-import error.pirate.backend.shippingInstruction.query.dto.ItemDTO;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListDTO;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListResponse;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionResponse;
+import error.pirate.backend.shippingInstruction.query.dto.*;
 import error.pirate.backend.shippingInstruction.query.mapper.ShippingInstructionMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,16 +37,15 @@ public class ShippingInstructionQueryService {
     public ShippingInstructionResponse readShippingInstruction(long shippingInstructionSeq) {
 
         // 품목을 제외한 출하지시서 조회
-        ShippingInstructionResponse shippingInstruction
-                = shippingInstructionMapper.selectShippingInstructionByShippingInstructionSeq(shippingInstructionSeq);
+        ShippingInstructionDTO shippingInstruction = shippingInstructionMapper.selectShippingInstructionByShippingInstructionSeq(shippingInstructionSeq);
 
         // 출하지시서에 해당하는 품목 리스트 조회
-        List<ItemDTO> itemList
+        List<ShippingInstructionItemDTO> itemList
                 = shippingInstructionMapper.selectItemListByShippingInstructionSeq(shippingInstructionSeq);
 
-        // 출하지시서에 품목 리스트 추가
-        shippingInstruction.setItemList(itemList);
-
-        return shippingInstruction;
+        return ShippingInstructionResponse.builder()
+                .shippingInstructionDTO(shippingInstruction)
+                .itemList(itemList)
+                .build();
     }
 }

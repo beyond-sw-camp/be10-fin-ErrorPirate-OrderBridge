@@ -1,9 +1,6 @@
 package error.pirate.backend.shippingInstruction.service;
 
-import error.pirate.backend.shippingInstruction.query.dto.ItemDTO;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListDTO;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListResponse;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionResponse;
+import error.pirate.backend.shippingInstruction.query.dto.*;
 import error.pirate.backend.shippingInstruction.query.mapper.ShippingInstructionMapper;
 import error.pirate.backend.shippingInstruction.query.service.ShippingInstructionQueryService;
 import org.junit.jupiter.api.BeforeAll;
@@ -19,7 +16,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,8 +33,8 @@ class ShippingInstructionServiceTest {
     ShippingInstructionMapper shippingInstructionMapper;
 
     private static List<ShippingInstructionListDTO> mockShoppingInstructionList;
-    private static ShippingInstructionResponse mockShippingInstruction;
-    private static List<ItemDTO> mockItemList;
+    private static ShippingInstructionDTO mockShippingInstruction;
+    private static List<ShippingInstructionItemDTO> mockItemList;
 
     @BeforeAll
     public static void setUp() {
@@ -50,7 +46,7 @@ class ShippingInstructionServiceTest {
                         .shippingInstructionStatus("결재 전")
                         .shippingInstructionScheduledShipmentDate(LocalDate.of(2024, 12, 15))
                         .clientName("고객사 A")
-                        .itemNames(List.of("품목1", "품목2"))
+                        .itemName("품목1, 품목2")
                         .build(),
                 ShippingInstructionListDTO.builder()
                         .shippingInstructionSeq(2L)
@@ -58,12 +54,12 @@ class ShippingInstructionServiceTest {
                         .shippingInstructionStatus("결재 후")
                         .shippingInstructionScheduledShipmentDate(LocalDate.of(2024, 12, 20))
                         .clientName("고객사 B")
-                        .itemNames(List.of("품목3", "품목4"))
+                        .itemName("품목3, 품목4")
                         .build()
         );
 
         // mockShippingInstruction 데이터 설정
-        mockShippingInstruction = ShippingInstructionResponse.builder()
+        mockShippingInstruction = ShippingInstructionDTO.builder()
                 .shippingInstructionSeq(1L)
                 .shippingInstructionName("출하지시서1")
                 .shippingInstructionStatus("결재 전")
@@ -76,7 +72,7 @@ class ShippingInstructionServiceTest {
 
         // mockItemList 데이터 설정
         mockItemList = List.of(
-                ItemDTO.builder()
+                ShippingInstructionItemDTO.builder()
                         .itemName("품목1")
                         .itemDivision("Division1")
                         .itemPrice(1000)
@@ -84,7 +80,7 @@ class ShippingInstructionServiceTest {
                         .shippingInstructionItemNote("비고1")
                         .itemTotalQuantity(100)
                         .build(),
-                ItemDTO.builder()
+                ShippingInstructionItemDTO.builder()
                         .itemName("품목2")
                         .itemDivision("Division2")
                         .itemPrice(2000)
@@ -130,14 +126,14 @@ class ShippingInstructionServiceTest {
         assertThat(response.getShippingInstructionList().get(0).getShippingInstructionStatus()).isEqualTo("결재 전");
         assertThat(response.getShippingInstructionList().get(0).getShippingInstructionScheduledShipmentDate()).isEqualTo(LocalDate.of(2024, 12, 15));
         assertThat(response.getShippingInstructionList().get(0).getClientName()).isEqualTo("고객사 A");
-        assertThat(response.getShippingInstructionList().get(0).getItemNames()).isEqualTo(List.of("품목1", "품목2"));
+        assertThat(response.getShippingInstructionList().get(0).getItemName()).isEqualTo("품목1, 품목2");
         // 두 번째 리스트 내용 검증
         assertThat(response.getShippingInstructionList().get(1).getShippingInstructionSeq()).isEqualTo(2L);
         assertThat(response.getShippingInstructionList().get(1).getShippingInstructionName()).isEqualTo("출하지시서2");
         assertThat(response.getShippingInstructionList().get(1).getShippingInstructionStatus()).isEqualTo("결재 후");
         assertThat(response.getShippingInstructionList().get(1).getShippingInstructionScheduledShipmentDate()).isEqualTo(LocalDate.of(2024, 12, 20));
         assertThat(response.getShippingInstructionList().get(1).getClientName()).isEqualTo("고객사 B");
-        assertThat(response.getShippingInstructionList().get(1).getItemNames()).isEqualTo(List.of("품목3", "품목4"));
+        assertThat(response.getShippingInstructionList().get(1).getItemName()).isEqualTo("품목3, 품목4");
         // 페이징 정보 검증
         assertEquals(page, response.getCurrentPage());
         assertEquals(1, response.getTotalPages());  // 전체 페이지 수 계산이 올바른지 확인
@@ -168,14 +164,14 @@ class ShippingInstructionServiceTest {
 
         // Then
         assertNotNull(response);  // 응답 객체가 null이 아님을 확인
-        assertEquals(shippingInstructionSeq, response.getShippingInstructionSeq());
-        assertEquals("출하지시서1", response.getShippingInstructionName());
-        assertEquals("결재 전", response.getShippingInstructionStatus());
-        assertEquals(LocalDateTime.of(2024, 12, 15, 12, 0, 0), response.getShippingInstructionScheduledShipmentDate());
-        assertEquals("고객사 A", response.getClientName());
-        assertEquals(100, response.getShippingInstructionTotalQuantity());
-        assertEquals("주소", response.getShippingInstructionAddress());
-        assertEquals("비고", response.getShippingInstructionNote());
+        assertEquals(shippingInstructionSeq, response.getShippingInstructionDTO().getShippingInstructionSeq());
+        assertEquals("출하지시서1", response.getShippingInstructionDTO().getShippingInstructionName());
+        assertEquals("결재 전", response.getShippingInstructionDTO().getShippingInstructionStatus());
+        assertEquals(LocalDateTime.of(2024, 12, 15, 12, 0, 0), response.getShippingInstructionDTO().getShippingInstructionScheduledShipmentDate());
+        assertEquals("고객사 A", response.getShippingInstructionDTO().getClientName());
+        assertEquals(100, response.getShippingInstructionDTO().getShippingInstructionTotalQuantity());
+        assertEquals("주소", response.getShippingInstructionDTO().getShippingInstructionAddress());
+        assertEquals("비고", response.getShippingInstructionDTO().getShippingInstructionNote());
         assertEquals(2, response.getItemList().size());
         assertEquals("품목1", response.getItemList().get(0).getItemName());
         assertEquals("Division1", response.getItemList().get(0).getItemDivision());

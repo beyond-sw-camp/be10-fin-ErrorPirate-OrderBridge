@@ -1,9 +1,6 @@
 package error.pirate.backend.shippingInstruction.controller;
 
-import error.pirate.backend.shippingInstruction.query.dto.ItemDTO;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListDTO;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListResponse;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionResponse;
+import error.pirate.backend.shippingInstruction.query.dto.*;
 import error.pirate.backend.shippingInstruction.query.service.ShippingInstructionQueryService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -47,7 +44,7 @@ class ShippingInstructionControllerTest {
                         .shippingInstructionStatus("결재 전")
                         .shippingInstructionScheduledShipmentDate(LocalDate.of(2024, 12, 15))
                         .clientName("고객사 A")
-                        .itemNames(List.of("품목1", "품목2"))
+                        .itemName("품목1, 품목2")
                         .build(),
                 ShippingInstructionListDTO.builder()
                         .shippingInstructionSeq(2L)
@@ -55,7 +52,7 @@ class ShippingInstructionControllerTest {
                         .shippingInstructionStatus("결재 후")
                         .shippingInstructionScheduledShipmentDate(LocalDate.of(2024, 12, 20))
                         .clientName("고객사 B")
-                        .itemNames(List.of("품목3", "품목4"))
+                        .itemName("품목3, 품목4")
                         .build()
         );
 
@@ -66,8 +63,20 @@ class ShippingInstructionControllerTest {
                 .totalItems(2)
                 .build();
 
-        List<ItemDTO> items = List.of(
-                ItemDTO.builder()
+        ShippingInstructionDTO shippingInstruction
+                = ShippingInstructionDTO.builder()
+                .shippingInstructionSeq(1L)
+                .shippingInstructionName("출하지시서1")
+                .shippingInstructionStatus("결재 전")
+                .shippingInstructionScheduledShipmentDate(LocalDateTime.of(2024, 12, 15, 10, 30))
+                .clientName("고객사 A")
+                .shippingInstructionTotalQuantity(15)
+                .shippingInstructionAddress("서울특별시 강남구")
+                .shippingInstructionNote("조심히 배송")
+                .build();
+
+        List<ShippingInstructionItemDTO> items = List.of(
+                ShippingInstructionItemDTO.builder()
                         .itemName("품목1")
                         .itemDivision("A")
                         .itemPrice(1000)
@@ -75,7 +84,7 @@ class ShippingInstructionControllerTest {
                         .shippingInstructionItemNote("특별 관리")
                         .itemTotalQuantity(20)
                         .build(),
-                ItemDTO.builder()
+                ShippingInstructionItemDTO.builder()
                         .itemName("품목2")
                         .itemDivision("B")
                         .itemPrice(2000)
@@ -86,14 +95,7 @@ class ShippingInstructionControllerTest {
         );
 
         shippingInstructionResponse = ShippingInstructionResponse.builder()
-                .shippingInstructionSeq(1L)
-                .shippingInstructionName("출하지시서1")
-                .shippingInstructionStatus("결재 전")
-                .shippingInstructionScheduledShipmentDate(LocalDateTime.of(2024, 12, 15, 10, 30))
-                .clientName("고객사 A")
-                .shippingInstructionTotalQuantity(15)
-                .shippingInstructionAddress("서울특별시 강남구")
-                .shippingInstructionNote("조심히 배송")
+                .shippingInstructionDTO(shippingInstruction)
                 .itemList(items)
                 .build();
     }
@@ -117,15 +119,13 @@ class ShippingInstructionControllerTest {
                 .andExpect(jsonPath("$.shippingInstructionList[0].shippingInstructionStatus").value("결재 전"))
                 .andExpect(jsonPath("$.shippingInstructionList[0].shippingInstructionScheduledShipmentDate").value("2024-12-15"))
                 .andExpect(jsonPath("$.shippingInstructionList[0].clientName").value("고객사 A"))
-                .andExpect(jsonPath("$.shippingInstructionList[0].itemNames[0]").value("품목1"))
-                .andExpect(jsonPath("$.shippingInstructionList[0].itemNames[1]").value("품목2"))
+                .andExpect(jsonPath("$.shippingInstructionList[0].itemName").value("품목1, 품목2"))
                 .andExpect(jsonPath("$.shippingInstructionList[1].shippingInstructionSeq").value(2L))
                 .andExpect(jsonPath("$.shippingInstructionList[1].shippingInstructionName").value("출하지시서2"))
                 .andExpect(jsonPath("$.shippingInstructionList[1].shippingInstructionStatus").value("결재 후"))
                 .andExpect(jsonPath("$.shippingInstructionList[1].shippingInstructionScheduledShipmentDate").value("2024-12-20"))
                 .andExpect(jsonPath("$.shippingInstructionList[1].clientName").value("고객사 B"))
-                .andExpect(jsonPath("$.shippingInstructionList[1].itemNames[0]").value("품목3"))
-                .andExpect(jsonPath("$.shippingInstructionList[1].itemNames[1]").value("품목4"))
+                .andExpect(jsonPath("$.shippingInstructionList[1].itemName").value("품목3, 품목4"))
                 .andExpect(jsonPath("$.currentPage").value(1))
                 .andExpect(jsonPath("$.totalPages").value(10))
                 .andExpect(jsonPath("$.totalItems").value(2))
@@ -150,14 +150,14 @@ class ShippingInstructionControllerTest {
         // When: 출하지시서 상세 조회 요청을 보냄
         mockMvc.perform(get("/api/v1/shipping-instruction/" + shippingInstructionSeq))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.shippingInstructionSeq").value(1L))
-                .andExpect(jsonPath("$.shippingInstructionName").value("출하지시서1"))
-                .andExpect(jsonPath("$.shippingInstructionStatus").value("결재 전"))
-                .andExpect(jsonPath("$.shippingInstructionScheduledShipmentDate").value("2024-12-15T10:30:00"))
-                .andExpect(jsonPath("$.clientName").value("고객사 A"))
-                .andExpect(jsonPath("$.shippingInstructionTotalQuantity").value(15))
-                .andExpect(jsonPath("$.shippingInstructionAddress").value("서울특별시 강남구"))
-                .andExpect(jsonPath("$.shippingInstructionNote").value("조심히 배송"))
+                .andExpect(jsonPath("$.shippingInstructionDTO.shippingInstructionSeq").value(1L))
+                .andExpect(jsonPath("$.shippingInstructionDTO.shippingInstructionName").value("출하지시서1"))
+                .andExpect(jsonPath("$.shippingInstructionDTO.shippingInstructionStatus").value("결재 전"))
+                .andExpect(jsonPath("$.shippingInstructionDTO.shippingInstructionScheduledShipmentDate").value("2024-12-15T10:30:00"))
+                .andExpect(jsonPath("$.shippingInstructionDTO.clientName").value("고객사 A"))
+                .andExpect(jsonPath("$.shippingInstructionDTO.shippingInstructionTotalQuantity").value(15))
+                .andExpect(jsonPath("$.shippingInstructionDTO.shippingInstructionAddress").value("서울특별시 강남구"))
+                .andExpect(jsonPath("$.shippingInstructionDTO.shippingInstructionNote").value("조심히 배송"))
                 .andExpect(jsonPath("$.itemList[0].itemName").value("품목1"))
                 .andExpect(jsonPath("$.itemList[0].itemDivision").value("A"))
                 .andExpect(jsonPath("$.itemList[0].itemPrice").value(1000))

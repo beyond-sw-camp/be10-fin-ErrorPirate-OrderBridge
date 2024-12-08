@@ -12,28 +12,30 @@
             si.shipping_instruction_name,
             si.shipping_instruction_status,
             si.shipping_instruction_scheduled_shipment_date,
-            so.client_name,
+            c.client_name,
             (
-                SELECT GROUP_CONCAT(i.item_name SEPARATOR ', ')
+                SELECT
+                GROUP_CONCAT(i.item_name SEPARATOR ", ")
                 FROM tb_shipping_instruction_item sii
-                JOIN tb_item i ON sii.item_seq = i.item_seq
-                WHERE sii.shipping_instruction_seq = si.shipping_instruction_seq
-            ) AS item_names
+                JOIN tb_item i ON i.item_seq = sii.item_seq
+                WHERE si.shipping_instruction_seq = sii.shipping_instruction_seq
+            ) AS item_name
         FROM tb_shipping_instruction si
-        JOIN tb_sales_order so ON si.sales_order_seq = so.sales_order_seq
+        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
+        JOIN tb_client c ON (so.client_seq = c.client_seq)
         WHERE si.shipping_instruction_status IN ('결재 전', '결재 후')
-        <trim prefixOverrides="AND |OR ">
-            <if test="startDate != NULL AND endDate != NULL">
-                AND si.shipping_instruction_scheduled_shipment_date BETWEEN #{startDate} AND #{endDate}
-            </if>
-            <if test="clientName != null">
-                AND so.client_name LIKE CONCAT('%', #{clientName}, '%')
-            </if>
-            <if test="shippingInstructionStatus != null">
-                AND si.shipping_instruction_status LIKE #{shippingInstructionStatus}
-            </if>
-        </trim>
-        ORDER BY si.shipping_instruction_reg_date DESC
+        <if test="startDate != null"><![CDATA[
+            AND #{startDate} <= tb_quotation.quotation_quotation_date
+             ]]></if>
+        <if test="endDate != null"><![CDATA[
+            AND #{endDate} >= tb_quotation.quotation_quotation_date
+            ]]></if>
+        <if test="clientName != null">
+            AND so.client_name LIKE CONCAT('%', #{clientName}, '%')
+        </if>
+        <if test="shippingInstructionStatus != null">
+            AND si.shipping_instruction_status LIKE #{shippingInstructionStatus}
+        </if>
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
@@ -41,47 +43,56 @@
     <select id="countShippingInstruction" resultType="long">
         SELECT COUNT(*)
         FROM tb_shipping_instruction si
-        JOIN tb_sales_order so ON si.sales_order_seq = so.sales_order_seq
-        <trim prefix="WHERE" prefixOverrides="AND |OR ">
-            <if test="startDate != NULL AND endDate != NULL">
-                si.shipping_instruction_scheduled_shipment_date BETWEEN #{startDate} AND #{endDate}
-            </if>
-            <if test="clientName != null">
-                AND so.client_name LIKE CONCAT('%', #{clientName}, '%')
-            </if>
-            <if test="shippingInstructionStatus != null">
-                AND si.shipping_instruction_status LIKE #{shippingInstructionStatus}
-            </if>
-        </trim>
+        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
+        JOIN tb_client c ON (so.client_seq = c.client_seq)
+        WHERE si.shipping_instruction_status IN ('결재 전', '결재 후')
+        <if test="startDate != null"><![CDATA[
+            AND #{startDate} <= tb_quotation.quotation_quotation_date
+             ]]></if>
+        <if test="endDate != null"><![CDATA[
+            AND #{endDate} >= tb_quotation.quotation_quotation_date
+            ]]></if>
+        <if test="clientName != null">
+            AND so.client_name LIKE CONCAT('%', #{clientName}, '%')
+        </if>
+        <if test="shippingInstructionStatus != null">
+            AND si.shipping_instruction_status LIKE #{shippingInstructionStatus}
+        </if>
     </select>
 
     <!--    출하지시서 상세 조회  -->
     <select id="selectShippingInstructionByShippingInstructionSeq"
-            resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionResponse">
+            resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionDTO">
         SELECT
             si.shipping_instruction_seq,
             si.shipping_instruction_name,
             si.shipping_instruction_status,
             si.shipping_instruction_scheduled_shipment_date,
-            so.client_name,
+            c.client_name,
             si.shipping_instruction_total_quantity,
             si.shipping_instruction_address,
-            si.shipping_instruction_note,
+            u.user_name,
+            si.shipping_instruction_note
         FROM tb_shipping_instruction si
-        JOIN tb_sales_order so ON si.sales_order_seq = so.sales_order_seq
+        JOIN tb_user u ON (si.user_seq = u.user_seq)
+        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
+        JOIN tb_client c ON (so.client_seq = c.client_seq)
         WHERE si.shipping_instruction_seq = #{shippingInstructionSeq}
     </select>
 
-    <!--    출하지시서 품목 리스트 조회  -->
+    <!--    출하지시서 상세 품목 조회  -->
     <select id="selectItemListByShippingInstructionSeq"
-            resultType="error.pirate.backend.shippingInstruction.query.dto.ItemDTO">
+            resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionItemDTO">
         SELECT
+            sii.shipping_instruction_item_seq,
+            sii.item_seq,
+            i.item_image_url,
             i.item_name,
             i.item_division,
             i.item_price,
-            sii.shippingInstructionItemQuantity,
-            sii.shippingInstructionItemNote,
-            (i.item_price * sii.shippingInstructionItemQuantity) AS itemTotalQuantity
+            sii.shipping_instruction_item_quantity,
+            sii.shipping_instruction_item_note,
+            (i.item_price * sii.shipping_instruction_item_quantity) AS itemTotalQuantity
         FROM tb_shipping_instruction_item sii
         JOIN tb_item i ON sii.item_seq = i.item_seq
         WHERE sii.shipping_instruction_seq = #{shippingInstructionSeq}

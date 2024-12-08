@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @Builder
@@ -16,7 +15,7 @@ public class ShippingInstructionListDTO {
     private String shippingInstructionStatus;
     private LocalDate shippingInstructionScheduledShipmentDate;
     private String clientName;
-    private List<String> itemNames;
+    private String itemName;
 
 
 }
