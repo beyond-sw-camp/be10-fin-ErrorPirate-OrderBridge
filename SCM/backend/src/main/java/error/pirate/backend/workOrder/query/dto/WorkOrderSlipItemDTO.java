@@ -6,13 +6,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Schema(description = "작업지시서 품목 DTO")
-public class WorkOrderItemDTO {
+@Schema(description = "작업지시서 전표 품목 DTO")
+public class WorkOrderSlipItemDTO {
 
     private Long itemSeq;
-    private String itemName;
-    private String itemImageUrl;
-    private String itemPrice;
     private String itemUnitTitle;
+    private Long chileItemSeq;
+    private String childItemName;
+    private int bomQuantity;
+
 
 }

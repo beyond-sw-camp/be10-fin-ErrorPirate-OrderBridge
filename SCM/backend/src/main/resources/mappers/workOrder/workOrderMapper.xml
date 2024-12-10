@@ -66,6 +66,7 @@
         </where>
     </select>
 
+    <!-- 작업지시서 상세조회 -->
     <select id="readWorkOrder" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderDetailDTO">
         SELECT wo.work_order_seq
              , wo.work_order_name
@@ -90,16 +91,20 @@
        WHERE wo.work_order_seq = #{workOrderSeq}
     </select>
 
+    <!-- 작업지시서 상세 품목조회 -->
     <select id="readItemByWorkOrderSeq" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderItemDTO">
         SELECT  i.item_seq
               , i.item_name
               , i.item_image_url
               , i.item_price
+              , iu.item_unit_title
          FROM tb_work_order wo
          JOIN tb_item i ON wo.item_seq = i.item_seq
+         JOIN tb_item_unit iu ON i.item_unit_seq = iu.item_unit_seq
         WHERE wo.work_order_seq = #{workOrderSeq}
     </select>
 
+    <!-- 작업지시서 현황조회 -->
     <select id="readWorkOrderSituations" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderSituationDTO">
         SELECT i.item_name
              , c.client_name
@@ -129,10 +134,44 @@
             </if>
             <!-- 생산창고 필터링 -->
             <if test="warehouseName != null">
-                AND i.item_name LIKE CONCAT('%', #{warehouseName}, '%')
+                AND w.warehouse_name LIKE CONCAT('%', #{warehouseName}, '%')
             </if>
         </where>
          ORDER BY wo.work_order_indicated_date
+    </select>
+
+    <select id="readWorkOrderSlip" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderSlipDTO">
+        SELECT wo.work_order_seq
+             , wo.work_order_name
+             , wo.work_order_reg_date
+             , wo.work_order_mod_date
+             , wo.work_order_indicated_date
+             , wo.work_order_due_date
+             , c.client_name
+             , u.user_name
+             , w.warehouse_name
+             , i.item_name AS parent_item_name
+             , wo.work_order_indicated_quantity
+          FROM tb_work_order wo
+          JOIN tb_client c ON wo.client_seq = c.client_seq
+          JOIN tb_user u ON wo.user_seq = u.user_seq
+          JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
+          JOIN order_bridge.tb_item i on wo.item_seq = i.item_seq
+         WHERE wo.work_order_seq = #{workOrderSeq}
+    </select>
+
+    <select id="readWorkOrderSlipItemByWorkOrderSeq" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderSlipItemDTO">
+        SELECT wo.item_seq
+             , iu.item_unit_title
+             , bi.child_item_seq
+             , ci.item_name AS child_item_name
+             , bi.bom_child_item_quantity AS bom_quantity
+          FROM tb_work_order wo
+          LEFT JOIN tb_item i ON wo.item_seq = i.item_seq
+          LEFT JOIN tb_item_unit iu ON i.item_unit_seq = iu.item_unit_seq
+          LEFT JOIN tb_bom_item bi ON i.item_seq = bi.parent_item_seq
+          LEFT JOIN tb_item ci ON bi.child_item_seq = ci.item_seq
+         WHERE wo.work_order_seq = #{workOrderSeq};
     </select>
     
 </mapper>

@@ -31,4 +31,9 @@ public interface WorkOrderMapper {
             @Param("clientName") String clientName,
             @Param("warehouseName") String warehouseName);
 
+    /* 작업지시서 전표 조회 */
+    WorkOrderSlipDTO readWorkOrderSlip(@Param("workOrderSeq") Long workOrderSeq);
+
+    /* 작업지시서 전표 품목 조회*/
+    List<WorkOrderSlipItemDTO> readWorkOrderSlipItemByWorkOrderSeq(@Param("workOrderSeq") Long workOrderSeq);
 }

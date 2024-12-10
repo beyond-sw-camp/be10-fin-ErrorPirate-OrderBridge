@@ -101,8 +101,13 @@ public class WorkOrderQueryService {
                                 .collect(Collectors.groupingBy(situation ->
                                    situation.getWorkOrderIndicatedDate().format(DateTimeFormatter.ofPattern("yyyy/MM"))));
 
+        // 월별 데이터 정렬
+        List<Map.Entry<String, List<WorkOrderSituationDTO>>> sortedByMonth = groupedByMonth.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey()) // 키(월별 데이터)를 기준으로 정렬
+                .toList();
+
         // 월별 데이터 생성
-        List<MonthlyWorkOrderSituationDTO> monthlySituations = groupedByMonth.entrySet().stream()
+        List<MonthlyWorkOrderSituationDTO> monthlySituations = sortedByMonth.stream()
                 .map(entry -> MonthlyWorkOrderSituationDTO.builder()
                         .month(entry.getKey())
                         .situations(entry.getValue())
@@ -126,4 +131,22 @@ public class WorkOrderQueryService {
         return response;
     }
 
+    /* 전표 조회 */
+    public WorkOrderSlipResponse readWorkOrderSlip(Long workOrderSeq) {
+        log.info("-------------- 작업지시서 전표조회 서비스 진입 - workOrderSeq: {} --------------", workOrderSeq);
+
+        // BOM(하위) 품목 제외 전표(완제품이름 포함) 조회
+        WorkOrderSlipDTO workOrderSlip = workOrderMapper.readWorkOrderSlip(workOrderSeq);
+        if (workOrderSlip == null) {
+            throw new CustomException(ErrorCodeType.WORK_ORDER_NOT_FOUND);
+        }
+
+        // BOM 품목 조회
+        List<WorkOrderSlipItemDTO> bomItems  = workOrderMapper.readWorkOrderSlipItemByWorkOrderSeq(workOrderSeq);
+
+        return WorkOrderSlipResponse.builder()
+                .slipDTO(workOrderSlip)
+                .items(bomItems)
+                .build();
+    }
 }

@@ -3,6 +3,7 @@ package error.pirate.backend.workOrder.query.service;
 import error.pirate.backend.workOrder.query.dto.WorkOrderFilterDTO;
 import error.pirate.backend.workOrder.query.dto.WorkOrderListResponse;
 import error.pirate.backend.workOrder.query.dto.WorkOrderResponse;
+import error.pirate.backend.workOrder.query.dto.WorkOrderSlipResponse;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -108,6 +109,21 @@ class WorkOrderQueryServiceTest {
         assertDoesNotThrow(
                 () -> workOrderService.readWorkOrderSituation(startDate, endDate, clientName, warehouseName)
         );
+    }
+
+    @DisplayName("작업지시서 전표 조회 테스트")
+    @Test
+    void readWorkOrderSlipTest() {
+        // Given: 테스트 데이터 ID
+        Long workOrderSeq = 2L; // 존재하는 테스트 데이터 ID를 사용
+
+        // When: 상세 조회 호출
+        WorkOrderSlipResponse response = workOrderService.readWorkOrderSlip(workOrderSeq);
+
+        // Then: 결과 검증
+        assertNotNull(response, "응답이 null이 아님");
+        assertNotNull(response.getSlipDTO(), "작업지시서 전표 정보가 존재해야 함");
+        assertNotNull(response.getItems(), "작업지시서 전표 품목 정보가 존재해야 함");
     }
 
 

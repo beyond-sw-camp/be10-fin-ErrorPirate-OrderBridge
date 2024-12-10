@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/workOrder")
 @Slf4j
-@Tag(name = "Work_Order", description = "작업지시서 관리")
+@Tag(name = "Work Order", description = "작업지시서")
 public class WorkOrderQueryController {
 
     private final WorkOrderQueryService workOrderQueryService;
@@ -58,6 +58,14 @@ public class WorkOrderQueryController {
     }
 
     /* 전표조회 */
+    @GetMapping("/{workOrderSeq}/slip")
+    @Operation(summary = "작업지시서 전표조회", description = "작업지시서 전표를 조회한다.")
+    public ResponseEntity<WorkOrderSlipResponse> readWorkOrderSlip (@PathVariable Long workOrderSeq){
+        log.info("-------------- GET /api/v1/workOrder/{}/slip 작업지시서 전표조회 요청 --------------", workOrderSeq);
 
+        WorkOrderSlipResponse response = workOrderQueryService.readWorkOrderSlip(workOrderSeq);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
 }
