@@ -26,11 +26,15 @@ class ProductionReceivingQueryServiceTest {
     ProductionReceivingQueryService productionReceivingQueryService;
 
     private static Stream<Arguments> readProductionReceivingListParam() {
+        ProductionReceivingStatus[] statusArr =  new ProductionReceivingStatus[2];
+        statusArr[0] = ProductionReceivingStatus.BEFORE;
+        statusArr[1] = ProductionReceivingStatus.AFTER;
+
         return Stream.of(
-                arguments("2024-12-09", "2024-12-12", "2024/12/09-1", "BEFORE", 0, 10),
-                arguments(null, null, "2024/12/09-1", "BEFORE", 0, 4),
-                arguments(null, "2024-12-12", "2024/12/09-1", "BEFORE", 0, 8),
-                arguments("2024-12-09", "2024-12-12", null, "BEFORE", 0, 5),
+                arguments("2024-12-09", "2024-12-12", "2024/12/09-1", statusArr, 0, 10),
+                arguments(null, null, "2024/12/09-1", statusArr, 0, 4),
+                arguments(null, "2024-12-12", "2024/12/09-1", statusArr, 0, 8),
+                arguments("2024-12-09", "2024-12-12", null, statusArr, 0, 5),
                 arguments("2024-12-09", "2024-12-12", "2024/12/09-1", null, 0, 1),
                 arguments(null, null, null, null, 0, 20)
         );
@@ -41,7 +45,7 @@ class ProductionReceivingQueryServiceTest {
     @MethodSource("readProductionReceivingListParam")
     void readProductionReceivingList(LocalDate searchStartDate,
                                  LocalDate searchEndDate, String searchName,
-                                 ProductionReceivingStatus searchStatus,
+                                 ProductionReceivingStatus[] searchStatus,
                                  int offset, int limit) {
         ProductionReceivingListRequest request = new ProductionReceivingListRequest(
             searchStartDate, searchEndDate, searchName, searchStatus

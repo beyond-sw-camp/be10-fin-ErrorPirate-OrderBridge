@@ -51,7 +51,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
-      <!-- Right aligned nav items -->
+    <!-- Right aligned nav items -->
     <b-navbar-nav class="ml-auto">
       <b-nav-item href="#"><chatbotIcon class="icon-right" /></b-nav-item>
       <b-nav-item href="#"><notificationIcon class="icon-right" /></b-nav-item>

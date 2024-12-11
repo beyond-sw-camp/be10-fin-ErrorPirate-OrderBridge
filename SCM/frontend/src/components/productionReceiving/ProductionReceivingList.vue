@@ -44,7 +44,11 @@ onMounted(() => {
   fetchProductionReceivingList();
 });
 
-watch([searchStartDate, searchEndDate, pageNumber], () => {
+watch([searchStartDate, searchEndDate], () => {
+  search();
+})
+
+watch(pageNumber, () => {
   fetchProductionReceivingList();
 })
 
@@ -54,6 +58,12 @@ function check(status) {
   } else {
     searchStatus.value.add(status);
   }
+
+  search();
+}
+
+function search() {
+  pageNumber.value = 1;
 
   fetchProductionReceivingList();
 }
@@ -73,7 +83,7 @@ function check(status) {
                     <p class="card-title">생산입고명</p>
                     <b-input-group class="mt-3">
                         <b-form-input v-model="searchName"></b-form-input>
-                        <b-button variant="light" class="button" @click="fetchProductionReceivingList()"><svg width="1em" id="Layer_1" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M344.5,298c15-23.6,23.8-51.6,23.8-81.7c0-84.1-68.1-152.3-152.1-152.3C132.1,64,64,132.2,64,216.3  c0,84.1,68.1,152.3,152.1,152.3c30.5,0,58.9-9,82.7-24.4l6.9-4.8L414.3,448l33.7-34.3L339.5,305.1L344.5,298z M301.4,131.2  c22.7,22.7,35.2,52.9,35.2,85c0,32.1-12.5,62.3-35.2,85c-22.7,22.7-52.9,35.2-85,35.2c-32.1,0-62.3-12.5-85-35.2  c-22.7-22.7-35.2-52.9-35.2-85c0-32.1,12.5-62.3,35.2-85c22.7-22.7,52.9-35.2,85-35.2C248.5,96,278.7,108.5,301.4,131.2z"/></svg></b-button>
+                        <b-button variant="light" class="button" @click="search()"><svg width="1em" id="Layer_1" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M344.5,298c15-23.6,23.8-51.6,23.8-81.7c0-84.1-68.1-152.3-152.1-152.3C132.1,64,64,132.2,64,216.3  c0,84.1,68.1,152.3,152.1,152.3c30.5,0,58.9-9,82.7-24.4l6.9-4.8L414.3,448l33.7-34.3L339.5,305.1L344.5,298z M301.4,131.2  c22.7,22.7,35.2,52.9,35.2,85c0,32.1-12.5,62.3-35.2,85c-22.7,22.7-52.9,35.2-85,35.2c-32.1,0-62.3-12.5-85-35.2  c-22.7-22.7-35.2-52.9-35.2-85c0-32.1,12.5-62.3,35.2-85c22.7-22.7,52.9-35.2,85-35.2C248.5,96,278.7,108.5,301.4,131.2z"/></svg></b-button>
                     </b-input-group>
                 </div>
             </div>
@@ -88,46 +98,52 @@ function check(status) {
         </div>
         <div class="col-md-9">
             <div>
-                <div class="d-flex justify-content-between">
-                    <div>검색결과: {{ totalCount }}개</div>
-                    <b-button variant="light" size="sm" class="button">생산입고 등록</b-button>
-                </div>
-                <div class="list-headline row">
-                    <div class="list-head col-4">생산입고명</div>
-                    <div class="list-head col-2">생산공장명</div>
-                    <div class="list-head col-2">보관창고명</div>
-                    <div class="list-head col-3">입고일</div>
-                    <div class="list-head col-1">상태</div>
-                </div>
+              <div class="d-flex justify-content-between">
+                  <div>검색결과: {{ totalCount }}개</div>
+                  <b-button variant="light" size="sm" class="button">생산입고 등록</b-button>
+              </div>
+              <div class="list-headline row">
+                  <div class="list-head col-4">생산입고명</div>
+                  <div class="list-head col-2">생산공장명</div>
+                  <div class="list-head col-2">보관창고명</div>
+                  <div class="list-head col-3">입고일</div>
+                  <div class="list-head col-1">상태</div>
+              </div>
+              <template v-if="productionReceivingList.length > 0">
                 <div style="max-height: 600px; overflow-y: auto;">
-                    <div v-for="productionReceiving in productionReceivingList" :key="productionReceiving.productionReceivingSeq" class="list-line row" @click="itemExtend">
-                        <div class="list-body col-4 left">
-                          {{ productionReceiving.productionReceivingName }}
-                          <div v-if="productionReceiving.productionReceivingItemList.length > 0">
-                            <template v-for="(productionReceivingItem, index) in productionReceiving.productionReceivingItemList" :key="productionReceivingItem.productionReceivingItemSeq">
-                              <template v-if="index === productionReceiving.productionReceivingItemList.length - 1">
-                                {{productionReceivingItem.itemName}}
-                              </template>
-                              <template v-else>
-                                {{productionReceivingItem.itemName + ", "}}
-                              </template>
-                            </template>
-                          </div>
-                        </div>
-                        <div class="list-body col-2">{{ productionReceiving.productionWarehouseName }}</div>
-                        <div class="list-body col-2">{{ productionReceiving.storeWarehouseName }}</div>
-                        <div class="list-body col-3">{{ productionReceiving.productReceivingRegDate }}</div>
-                        <div class="list-body col-1">{{ productionReceiving.productionReceivingStatus }}</div>
+                  <div v-for="productionReceiving in productionReceivingList" :key="productionReceiving.productionReceivingSeq" class="list-line row" @click="itemExtend">
+                    <div class="list-body col-4 left">
+                      {{ productionReceiving.productionReceivingName }}
+                      <div v-if="productionReceiving.productionReceivingItemList.length > 0">
+                        <template v-for="(productionReceivingItem, index) in productionReceiving.productionReceivingItemList" :key="productionReceivingItem.productionReceivingItemSeq">
+                          <template v-if="index === productionReceiving.productionReceivingItemList.length - 1">
+                            {{productionReceivingItem.itemName}}
+                          </template>
+                          <template v-else>
+                            {{productionReceivingItem.itemName + ", "}}
+                          </template>
+                        </template>
+                      </div>
                     </div>
+                    <div class="list-body col-2">{{ productionReceiving.productionWarehouseName }}</div>
+                    <div class="list-body col-2">{{ productionReceiving.storeWarehouseName }}</div>
+                    <div class="list-body col-3">{{ productionReceiving.productReceivingRegDate }}</div>
+                    <div class="list-body col-1">{{ productionReceiving.productionReceivingStatus }}</div>
+                  </div>
                 </div>
+                <div class="pagination">
+                  <b-pagination
+                      v-model="pageNumber"
+                      :totalRows="totalCount"
+                      :perPage="pageSize">
+                  </b-pagination>
+                </div>
+              </template>
+              <template v-else>
+                <b-card-text class="no-list-text">해당 검색조건에 부합한 생산입고가 존재하지 않습니다.</b-card-text>
+              </template>
             </div>
-            <div class="pagination">
-                <b-pagination
-                    v-model="pageNumber"
-                    :totalRows="totalCount"
-                    :perPage="pageSize">
-                </b-pagination>
-            </div>
+
         </div>
     </div>
 </template>
@@ -184,6 +200,11 @@ div {
 
 .left {
   text-align: left;
+}
+
+.no-list-text {
+  text-align: center;
+  margin-top: 10%;
 }
 
 </style>
