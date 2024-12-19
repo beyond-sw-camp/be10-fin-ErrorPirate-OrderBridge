@@ -183,7 +183,7 @@ function numberThree(number) {
             </div>
         </div>
         <div class="col-md-9">
-            <div style="width: 90%;">
+            <div style="width: 100%;">
                 <div class="d-flex justify-content-between">
                     <div>검색결과: {{ totalQuotation }}개</div>
                     <div class="d-flex justify-content-end mt-3">

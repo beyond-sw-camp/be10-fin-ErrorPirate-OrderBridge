@@ -227,9 +227,10 @@ const toggleSubMenu = (subMenu) => {
 .icon-wrapper {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 16px 0;
+  align-items: end;
+  padding: 5px;
   gap: 16px; /* 아이콘 간 간격 */
+  
 }
 
 .icon {
@@ -245,17 +246,26 @@ const toggleSubMenu = (subMenu) => {
   top: 76px; /* 헤더의 높이 */
   bottom: 0;
   height: 100%;
-  width: 40px;
+  width: 200px;
   background-color: #fff8e7;
   overflow: hidden;
   transition: width 0.3s ease;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  /* align-items: center; */
+  border: solid 1px;
+  border-radius: 0px 10px 0px 0px;
+  left: -150px;
+  transition-property: left;
+  transition-duration: 0.5s;
 }
 
 .side-bar.open {
   width: 200px;
+  left: 0px;
+  align-items: center;
+  transition-property: left;
+  transition-duration: 0.5s;
 }
 
 .side-bar ul {

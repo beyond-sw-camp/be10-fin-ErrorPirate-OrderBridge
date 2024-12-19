@@ -98,7 +98,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
 </template>
 <style scoped>
 .logo-img {
-  height: 50px; /* 로고 크기 */
+  height: 36px; /* 로고 크기 */
 }
 
 .icon {
