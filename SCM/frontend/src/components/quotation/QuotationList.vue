@@ -211,7 +211,7 @@ function numberThree(number) {
                         <div class="d-flex justify-content-center">
                             <div v-if="quotationExtended[quotation.quotationSeq]" class="col-md-11 mt-3">
                                 <b>총 수량</b>: {{ numberThree(quotationDetail[quotation.quotationSeq].quotationTotalQuantity) }} 개<br>
-                                <b>총 금액</b>: {{ `\\ ` + numberThree(quotationDetail[quotation.quotationSeq].quotationExtendedPrice) }}<br>
+                                <b>총 금액</b>: {{ `₩ ` + numberThree(quotationDetail[quotation.quotationSeq].quotationExtendedPrice) }}<br>
                                 <b>담당자</b>: {{ quotationDetail[quotation.quotationSeq].userName }}<br>
                                 <b>견적일시</b>: {{ dayjs(quotationDetail[quotation.quotationSeq].quotationQuotationDate).format(`YYYY/MM/DD HH:mm:ss`) }}<br>
                                 <b>유효일시</b>: {{ dayjs(quotationDetail[quotation.quotationSeq].quotationEffectiveDate).format(`YYYY/MM/DD HH:mm:ss`) }}<br>

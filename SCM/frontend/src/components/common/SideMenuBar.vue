@@ -253,7 +253,8 @@ const toggleSubMenu = (subMenu) => {
   display: flex;
   flex-direction: column;
   /* align-items: center; */
-  border: solid 1px;
+  border-top: solid 1px silver;
+  border-right: solid 1px silver;
   border-radius: 0px 10px 0px 0px;
   left: -150px;
   transition-property: left;
@@ -273,7 +274,7 @@ const toggleSubMenu = (subMenu) => {
   padding: 0;
   list-style: none;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  /* transition: opacity 0.3s ease; */
 }
 
 .side-bar.open ul {
