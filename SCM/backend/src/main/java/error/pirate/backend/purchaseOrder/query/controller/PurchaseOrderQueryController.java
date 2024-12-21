@@ -3,6 +3,7 @@ package error.pirate.backend.purchaseOrder.query.controller;
 import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderRequest;
 import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderResponsePagination;
 import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderSituationResponse;
+import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderStockSituationResponse;
 import error.pirate.backend.purchaseOrder.query.service.PurchaseOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -71,13 +72,21 @@ public class PurchaseOrderQueryController {
 
     @GetMapping("/stock/situation")
     @Operation(summary = "미입고 현황")
-    public void notInStockSituation() {
-
+    public ResponseEntity<List<PurchaseOrderStockSituationResponse>> notInStockSituation(PurchaseOrderRequest request) {
+        return ResponseEntity.ok(purchaseOrderService.readPurchaseOrderStockSituationList(request));
     }
 
     @GetMapping("/stock/situation/excelDown")
     @Operation(summary = "미입고 현황 엑셀다운")
-    public void notInStockSituationExcel() {
+    public ResponseEntity<byte[]> notInStockSituationExcel(PurchaseOrderRequest request) {
+        HttpHeaders headersResponse = new HttpHeaders();
+        String fileName = URLEncoder.encode("미입고_현황[" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "].xlsx", StandardCharsets.UTF_8);
+        headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+
+        return ResponseEntity.ok()
+                .headers(headersResponse)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(purchaseOrderService.purchaseOrderStockSituationExcelDown(request));
 
     }
 

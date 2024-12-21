@@ -231,7 +231,7 @@ const printItem = (index) => {
             <div v-for="(purchaseOrder, index) in purchaseOrderList" :key="purchaseOrder.purchaseOrderSeq || index"
                  class="list-line row" :id="'print-area-' + index" @click="toggleDetails(index)">
               <div class="list-body col-5 left">
-                {{ purchaseOrder.purchaseOrderName }}
+                <b> {{ purchaseOrder.purchaseOrderName }} </b>
                 <div v-if="purchaseOrder.purchaseOrderItemResponseList?.length > 0">
                   <template v-for="(purchaseOrderItem, idx) in purchaseOrder.purchaseOrderItemResponseList"
                             :key="purchaseOrderItem.purchaseOrderItemSeq || idx">
@@ -270,21 +270,27 @@ const printItem = (index) => {
                       발주서 비고 :
                       {{ purchaseOrder.purchaseOrderNote }}
                     </p>
-                  <div class="mb-3 d-flex flex-row">
+                  <div  style="display:flex; flex-wrap: wrap;">
                   <div v-for="(purchaseOrderItem, idx) in purchaseOrder.purchaseOrderItemResponseList"
                        :key="purchaseOrderItem.purchaseOrderItemSeq || idx"
-                       style="max-height: 250px;" class="me-5 col-md-3 d-flex flex-column border border-secondary rounded">
+                       class="card item-card">
                       <b-img
-                          style="max-height: 100px;"
+                          class="card-img-top"
                           :src="purchaseOrderItem.itemImageUrl != null ? purchaseOrderItem.itemImageUrl : 'https://picsum.photos/200/200'"
-                          fluid
                           alt="Responsive image">
                       </b-img>
-                      <p class="ms-3"> 상품명: {{ purchaseOrderItem.itemName }}</p>
-                      <p class="ms-3"> 수량: {{ purchaseOrderItem.purchaseOrderItemQuantity }}</p>
-                      <p class="ms-3"> 가격: {{ purchaseOrderItem.purchaseOrderItemPrice }}</p>
-                      <p class="ms-3"> 비고: {{ purchaseOrderItem.purchaseOrderItemNote }}</p>
+                    <div style="margin: 7px;">
+                      <div style="display: flex; justify-content: space-between;">
+                        <b style="font-size: medium;">{{ purchaseOrderItem.itemName }}</b>
+                      </div>
+                      <small>{{ purchaseOrderItem.purchaseOrderItemQuantity }} 개 </small>
+                      <small style="margin-left: 55%">{{ purchaseOrderItem.purchaseOrderItemPrice.toLocaleString() }} 원 </small>
+                      <br><br>
+                      <small v-if="purchaseOrderItem.purchaseOrderItemNote" style="margin-top: 20px;">
+                        비고: {{ purchaseOrderItem.purchaseOrderItemNote }}</small>
+                      <small v-else style="margin-top: 20px;">비고: 없음</small>
                     </div>
+                  </div>
                   </div>
                   <div class="d-flex justify-content-end align-items-center">
                     <printIcon class="me-3 icon" @click.stop="printItem(index)"/>
@@ -377,5 +383,16 @@ div {
   width: 20px;
   height: 20px;
 }
+
+.item-card {
+  width: 220px;
+  margin: 10px;
+}
+
+.card-img-top {
+  max-height: 80px;
+  object-fit: cover;
+}
+
 
 </style>

@@ -124,4 +124,46 @@
         tpo.purchase_order_reg_date WITH ROLLUP;
     </select>
 
+    <select id="readPurchaseOrderStockSituationList" resultType="error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderStockSituationResponse">
+        SELECT
+            tpo.purchase_order_name,
+            tpo.purchase_order_reg_date,
+            DATE_FORMAT(tpo.purchase_order_reg_date, '%Y-%m') as purchase_order_reg_month,
+            IFNULL(SUM(tpoi.purchase_order_item_extended_price), 0) as purchase_order_month_price,
+            IFNULL(SUM(tpoi.purchase_order_item_quantity), 0) as purchase_order_month_quantity,
+            ti.item_name,
+            tpoi.purchase_order_item_extended_price,
+            tpoi.purchase_order_item_quantity
+        FROM tb_purchase_order tpo
+        LEFT JOIN tb_purchase_order_item tpoi USING (purchase_order_seq)
+        LEFT JOIN tb_item ti ON tpoi.item_seq = ti.item_seq
+        WHERE tpo.purchase_order_status != 'DELETE'
+        AND NOT EXISTS (
+            SELECT
+                1
+            FROM
+            tb_purchase tp
+            WHERE
+            tp.purchase_order_seq = tpoi.purchase_order_seq
+        )
+        <if test="searchStartDate != null and searchStartDate != ''">
+            <![CDATA[
+                AND #{searchStartDate} <= tpo.purchase_order_reg_date
+                ]]>
+        </if>
+        <if test="searchEndDate != null and searchEndDate != ''">
+            <![CDATA[
+                AND #{searchEndDate} >= tpo.purchase_order_reg_date
+                ]]>
+        </if>
+        <if test="searchName != null">
+            AND ti.item_name LIKE CONCAT('%', #{searchName}, '%')
+        </if>
+        GROUP BY
+        DATE_FORMAT(tpo.purchase_order_reg_date, '%Y-%m'),
+        tpo.purchase_order_reg_date,
+        ti.item_name
+        WITH ROLLUP;
+    </select>
+
 </mapper>

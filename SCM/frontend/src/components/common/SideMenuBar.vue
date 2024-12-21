@@ -136,7 +136,7 @@ const toggleSubMenu = (subMenu) => {
                 <RouterLink class="content-item" to="/purchaseOrder">발주서 조회</RouterLink>
                 <RouterLink class="content-item" to="/purchaseOrder/input">발주서 등록</RouterLink>
                 <RouterLink class="content-item" to="/purchaseOrder/situation">발주서 현황</RouterLink>
-                <RouterLink class="content-item" to="">미입고 현황</RouterLink>
+                <RouterLink class="content-item" to="/purchaseOrder/stock/situation">미입고 현황</RouterLink>
               </li>
             </ul>
           </li>

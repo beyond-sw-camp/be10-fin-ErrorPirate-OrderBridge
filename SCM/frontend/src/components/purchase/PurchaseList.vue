@@ -219,7 +219,7 @@ const printItem = (index) => {
             <div v-for="(purchase, index) in purchaseList" :key="purchase.purchaseSeq || index"
                  class="list-line row" :id="'print-area-' + index" @click="toggleDetails(index)">
               <div class="list-body col-5 left">
-                {{ purchase.purchaseName }}
+                <b>{{ purchase.purchaseName }}</b>
                 <div v-if="purchase.purchaseItemResponseList?.length > 0">
                   <template v-for="(purchaseItem, idx) in purchase.purchaseItemResponseList"
                             :key="purchaseItem.purchaseItemSeq || idx">
@@ -255,21 +255,25 @@ const printItem = (index) => {
                     구매서 비고 :
                     {{ purchase.purchaseNote }}
                   </p>
-                  <div class="mb-3 d-flex flex-row">
+                  <div style="display:flex; flex-wrap: wrap;">
                     <div v-for="(purchaseItem, idx) in purchase.purchaseItemResponseList"
                          :key="purchaseItem.purchaseItemSeq || idx"
-                         style="max-height: 250px;" class="me-5 col-md-3 d-flex flex-column border border-secondary rounded">
-                      <b-img
-                          style="max-height: 100px;"
+                         class="card item-card">
+                      <img
+                          class="card-img-top"
                           :src="purchaseItem.itemImageUrl != null ? purchaseItem.itemImageUrl : 'https://picsum.photos/200/200'"
-                          fluid
                           alt="Responsive image">
-                      </b-img>
-                      <p class="ms-3"> 상품명: {{ purchaseItem.itemName }}</p>
-                      <p class="ms-3"> 입고 창고명: {{ purchaseItem.warehouseName }}</p>
-                      <p class="ms-3"> 수량: {{ purchaseItem.purchaseItemQuantity }}</p>
-                      <p class="ms-3"> 가격: {{ purchaseItem.purchaseItemPrice }}</p>
-                      <p class="ms-3"> 비고: {{ purchaseItem.purchaseItemNote }}</p>
+                      <div style="margin: 5px;">
+                        <div style="display: flex; justify-content: space-between;">
+                          <b style="font-size: medium;">{{ purchaseItem.itemName }}</b>
+                        </div>
+                        <small>입고 창고 : {{ purchaseItem.warehouseName }} </small><br />
+                        <small>수량 : {{ purchaseItem.purchaseItemQuantity }} 개 </small>
+                        <br><br>
+                        <small v-if="purchaseItem.purchaseItemNote" style="margin-top: 20px;">
+                          비고: {{ purchaseItem.purchaseItemNote }}</small>
+                        <small v-else style="margin-top: 20px;">비고: 없음</small>
+                      </div>
                     </div>
                   </div>
                   <div class="d-flex justify-content-end align-items-center">
@@ -361,6 +365,16 @@ div {
 .icon {
   width: 20px;
   height: 20px;
+}
+
+.item-card {
+  width: 220px;
+  margin: 10px;
+}
+
+.card-img-top {
+  max-height: 80px;
+  object-fit: cover;
 }
 
 </style>

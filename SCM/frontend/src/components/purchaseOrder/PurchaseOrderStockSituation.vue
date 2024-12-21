@@ -7,10 +7,10 @@ import searchIcon from "@/assets/searchIcon.svg";
 const searchStartDate = ref('');
 const searchEndDate = ref('');
 const searchName = ref('');
-const purchaseSituationList = ref([]);
-const purchaseSituationTotal = ref([]);
+const purchaseOrderSituationList = ref([]);
+const purchaseOrderSituationTotal = ref([]);
 
-const fetchPurchaseSituationList = async () => {
+const fetchPurchaseOrderSituationList = async () => {
   try {
     const params = {
       searchStartDate: searchStartDate.value,
@@ -22,26 +22,26 @@ const fetchPurchaseSituationList = async () => {
         Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
     );
 
-    const response = await axios.get(`http://localhost:8090/api/v1/purchase/situation`, {
+    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/stock/situation`, {
       params: filteredParams,
       paramsSerializer: (params) => {
         return new URLSearchParams(params).toString();
       }
     });
 
-    purchaseSituationTotal.value = response.data.pop();
-    purchaseSituationList.value = response.data;
+    purchaseOrderSituationTotal.value = response.data.pop();
+    purchaseOrderSituationList.value = response.data;
   } catch (error) {
-    console.error("구매 현황 불러오기 실패 :", error);
+    console.error("미입고 현황 불러오기 실패 :", error);
   }
 };
 
 onMounted(() => {
-  fetchPurchaseSituationList();
+  fetchPurchaseOrderSituationList();
 });
 
 watch([searchStartDate, searchEndDate], () => {
-  fetchPurchaseSituationList();
+  fetchPurchaseOrderSituationList();
 })
 
 const printTable = () => {
@@ -62,7 +62,7 @@ const printTable = () => {
 }
 
 const excelDown = async () => {
-  const excelName = "구매현황_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
+  const excelName = "미입고현황_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
   try {
     const params = {
       searchStartDate: searchStartDate.value,
@@ -74,7 +74,7 @@ const excelDown = async () => {
         Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
     );
 
-    const response = await axios.get(`http://localhost:8090/api/v1/purchase/situation/excelDown`, {
+    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/stock/situation/excelDown`, {
       params: filteredParams,
       paramsSerializer: (params) => {
         return new URLSearchParams(params).toString();
@@ -95,7 +95,7 @@ const excelDown = async () => {
     URL.revokeObjectURL(link.href);
 
   } catch (error) {
-    console.error("구매현황 엑셀다운로드 실패 :", error);
+    console.error("미입고현황 엑셀다운로드 실패 :", error);
   }
 }
 
@@ -106,13 +106,13 @@ const excelDown = async () => {
     <div class="col-md-3">
       <div class="side-box card">
         <div class="card-body">
-          <p class="card-title">구매일자</p>
+          <p class="card-title">발주일자</p>
           <input type="date" v-model="searchStartDate"/> ~ <input type="date" v-model="searchEndDate"/>
         </div>
       </div>
       <div class="side-box card">
         <div class="card-body">
-          <p class="card-title">구매서명</p>
+          <p class="card-title">미입고 품목</p>
           <b-input-group class="mt-3">
             <b-form-input v-model="searchName"></b-form-input>
             <b-button variant="light" class="button" @click="fetchPurchaseOrderSituationList()">
@@ -134,48 +134,45 @@ const excelDown = async () => {
             <thead>
             <tr>
               <th>번호</th>
-              <th>구매일자</th>
-              <th>구매서명</th>
+              <th>발주일자</th>
+              <th>발주서명</th>
+              <th>품목명</th>
               <th>총 수량</th>
               <th>금액</th>
-              <th>구매 계약일</th>
-              <th>구매서 비고</th>
             </tr>
             </thead>
-            <tbody v-if="purchaseSituationList.length > 0">
+            <tbody v-if="purchaseOrderSituationList.length > 0">
             <!-- 필터링된 결과 및 월별 합계 출력 -->
-            <template v-for="(purchaseSituation, index) in purchaseSituationList" :key="index">
-              <tr v-if="purchaseSituation.purchaseRegDate">
+            <template v-for="(purchaseOrderSituation, index) in purchaseOrderSituationList" :key="index">
+              <tr v-if="purchaseOrderSituation.purchaseOrderRegDate">
                 <td>{{ index + 1 }}</td>
-                <td>{{ dayjs(purchaseSituation.purchaseRegDate).format('YYYY/MM/DD HH:mm:ss') }}</td>
-                <td>{{ purchaseSituation.purchaseName }}</td>
-                <td>{{ purchaseSituation.purchaseTotalQuantity !== null ? purchaseSituation.purchaseTotalQuantity.toLocaleString() : '0' }}</td>
-                <td> ￦ {{ purchaseSituation.purchaseExtendedPrice !== null ? purchaseSituation.purchaseExtendedPrice.toLocaleString() : '0' }}</td>
-                <td>{{ dayjs(purchaseSituation.purchaseContractDate).format('YYYY/MM/DD HH:mm:ss') }}</td>
-                <td>{{ purchaseSituation.purchaseNote !== null ? purchaseSituation.purchaseNote : '-' }}</td>
+                <td>{{ dayjs(purchaseOrderSituation.purchaseOrderRegDate).format('YYYY/MM/DD HH:mm:ss') }}</td>
+                <td>{{ purchaseOrderSituation.purchaseOrderName }}</td>
+                <td>{{ purchaseOrderSituation.itemName }}</td>
+                <td>{{ purchaseOrderSituation.purchaseOrderItemQuantity !== null ? purchaseOrderSituation.purchaseOrderItemQuantity : '0' }}</td>
+                <td> ￦ {{ purchaseOrderSituation.purchaseOrderItemExtendedPrice !== null ? purchaseOrderSituation.purchaseOrderItemExtendedPrice.toLocaleString() : '0' }}</td>
               </tr>
               <tr v-else class="monthly-total">
                 <td> -</td>
-                <td>{{ purchaseSituation.purchaseRegMonth }}</td>
-                <td> -</td>
-                <td>{{ purchaseSituation.purchaseMonthQuantity.toLocaleString() }}</td>
-                <td> ￦ {{ purchaseSituation.purchaseMonthPrice.toLocaleString() }}</td>
+                <td>{{ purchaseOrderSituation.purchaseOrderRegMonth }}</td>
                 <td> -</td>
                 <td> -</td>
+                <td>{{ purchaseOrderSituation.purchaseOrderMonthQuantity.toLocaleString() }}</td>
+                <td> ￦ {{ purchaseOrderSituation.purchaseOrderMonthPrice.toLocaleString() }}</td>
               </tr>
             </template>
 
             </tbody>
             <tbody v-else>
             <tr>
-              <td colspan="6">해당 검색조건에 부합한 구매서 존재하지 않습니다</td>
+              <td colspan="6">해당 검색조건에 부합한 미입고 현황이 존재하지 않습니다</td>
             </tr>
             </tbody>
             <!-- 총합 -->
-            <tfoot v-if="purchaseSituationTotal">
+            <tfoot v-if="purchaseOrderSituationTotal">
             <tr>
-              <td colspan="5">총합</td>
-              <td colspan="2">￦ {{ purchaseSituationTotal.purchaseMonthPrice }}</td>
+              <td colspan="3">총합</td>
+              <td colspan="3">￦ {{ purchaseOrderSituationTotal.purchaseOrderMonthPrice }}</td>
             </tr>
             </tfoot>
           </table>
